@@ -1,65 +1,79 @@
-☕ Coffee Sales Analytics: Engenharia de Dados e BI
+# ☕ Coffee Sales Analytics — Pipeline de Dados & Dashboard Power BI
 
-Este projeto apresenta uma solução completa de análise de dados para uma cafeteria, cobrindo desde a criação da infraestrutura no banco de dados PostgreSQL até o desenvolvimento de um dashboard interativo no Power BI. O foco principal foi a transformação de dados brutos em inteligência de negócio através de processos de ETL e modelagem dimensional.
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Power BI](https://img.shields.io/badge/Power_BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
+![DAX](https://img.shields.io/badge/DAX-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)
+![SQL](https://img.shields.io/badge/SQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 
-📊 Dashboard Preview
-<img width="1302" height="730" alt="dash_image" src="https://github.com/user-attachments/assets/9936ee6a-6f16-46e0-89c3-f53bbf242180" />
+## 🎯 Problema de Negócio
+
+Uma cafeteria precisa entender sua performance de vendas, mas seus dados estão armazenados em formato bruto sem estrutura analítica. O objetivo deste projeto foi construir uma solução completa de Business Intelligence — da modelagem do banco de dados até o dashboard — para responder perguntas críticas como: quais produtos vendem mais? Em que períodos a receita é maior? Qual o ticket médio por tamanho de pedido?
+
+## 📊 Dashboard
+
+![Dashboard Preview](dash_image.png)
+
+## 🛠️ Tecnologias Utilizadas
+
+| Ferramenta | Uso |
+|---|---|
+| PostgreSQL | Modelagem, DDL, DML, Views |
+| SQL | Tratamento, lógica de negócio, CASE WHEN, UPDATE |
+| Power BI Desktop | Dashboard interativo e modelagem dimensional |
+| DAX | Medidas de negócio (faturamento, volumetria) |
+| Star Schema | Modelagem dimensional com tabela fato e dCalendário |
+
+## 🏗️ Arquitetura da Solução
+
+### 1. Camada de Dados — PostgreSQL
+
+A infraestrutura foi construída com scripts SQL para garantir integridade e performance:
+
+- **Tratamento de tipos:** conversão da coluna `money` para `NUMERIC` para evitar erros de precisão decimal
+- **Lógica de negócio via SQL:** classificação do tamanho do copo (Extra Grande, Grande, Médio, Pequeno) usando `CASE WHEN` com base na combinação de preço e nome do produto
+- **View como fonte única de verdade (SSOT):** criação da `vw_coffe_vendas` já com tratamento de datas, horas e categorias — essa view é a única fonte consumida pelo Power BI
+
+### 2. Modelagem Dimensional — Power BI (Star Schema)
+
+- **dCalendário:** tabela de dimensão de tempo com colunas de Ano, Mês e Semana formatadas por nome e número para ordenação correta
+- **Tabela de Medidas:** centralização de cálculos separando lógica de negócio da tabela fato
+  - `Soma Vendas` — faturamento total
+  - `Qtd_Cafes` — volumetria de pedidos
+
+### 3. Insights do Dashboard
+
+| Pergunta de Negócio | Visualização |
+|---|---|
+| Qual o faturamento total e volume de pedidos? | Cartões de KPI |
+| Como as vendas evoluem ao longo do tempo? | Vendas por Semana e por Mês |
+| Quais produtos são mais vendidos? | Ranking de Cafés Mais Vendidos |
+| Qual tamanho de copo domina as vendas? | Vendas por Tamanho do Copo |
+| Em que período do dia há mais pedidos? | Distribuição por período |
+
+## 📂 Estrutura do Repositório
+
+```
+📁 Analise_dados_Cafeteria/
+├── coffe_sales.csv       # Dataset original
+├── script.sql            # DDL, tratamentos e criação da View
+├── dash.pbix             # Arquivo Power BI com modelo e visuais
+└── dash_image.png        # Preview do dashboard
+```
+
+## 🚀 Como Executar
+
+1. Execute o `script.sql` no seu PostgreSQL (pgAdmin ou psql)
+2. Importe os dados do `coffe_sales.csv` para a tabela criada
+3. Abra o `dash.pbix` no Power BI Desktop
+4. Aponte a fonte de dados para o seu banco local nas configurações de conexão
+
+## 📌 Aprendizados Técnicos
+
+- Uso de `CASE WHEN` para injetar lógica de negócio diretamente na camada SQL, reduzindo transformações no Power BI
+- Criação de Views como contrato de interface entre banco de dados e ferramenta de BI
+- Modelagem Star Schema com tabela de calendário para análise temporal correta
+- Separação entre tabela fato e tabela de medidas DAX como boa prática de BI
+
+---
 
 
-🛠️ Tecnologias e Ferramentas
-
-Banco de Dados: PostgreSQL (SQL para DDL, DML e Views).
-
-Visualização e BI: Power BI Desktop.
-
-Linguagem de Medidas: DAX (Data Analysis Expressions).
-
-Modelagem: Star Schema com Tabela Fato e dCalendário.
-
-
-🏗️ Estrutura e Desenvolvimento
-
-1. Camada de Dados (PostgreSQL)
-A base do projeto foi construída utilizando scripts SQL para garantir a integridade e a performance:
-
-Tratamento de Tipos: Conversão dinâmica da coluna money para NUMERIC para evitar erros de precisão decimal.
-
-Lógica de Negócio Injetada: Implementação de um mapeamento complexo via CASE WHEN para classificar o Tamanho do Copo (Extra Grande, Grande, Médio, Pequeno) baseado na combinação de preço e nome do produto.
-
-View de Exportação: Criação da vw_coffe_vendas como fonte única de verdade (SSOT) para o Power BI, já com tratamento de datas, horas e a nova categoria de tamanho.
-
-2. Modelagem no Power BI
-Para garantir que o dashboard fosse dinâmico e preciso, a modelagem seguiu as melhores práticas de BI:
-
-Tabela dCalendário: Criada para suportar inteligência de tempo, contendo colunas de Ano, Mês e Semana (formatadas por nome e número para ordenação correta).
-
-Tabela de Medidas: Centralização de cálculos em uma tabela exclusiva, separando a lógica de negócio da tabela fato.
-
-Soma Vendas: Medida para faturamento total.
-
-Qtd_Cafes: Medida para volumetria de pedidos.
-
-3. Insights Visualizados
-O dashboard foi projetado para responder a perguntas críticas de negócio:
-
-Análise Temporal: Vendas por Semana e Vendas por Mês (utilizando a dCalendário).
-
-Mix de Produtos: Gráficos de Cafés Mais Vendidos e Vendas por Tamanho do Copo (derivado da lógica SQL).
-
-Performance Financeira: Cartões de Valor Total de Vendas e Total de Pedidos.
-
-Distribuição: Porcentagem de vendas por período do dia.
-
-
-📂 Organização do Repositório
-
-coffe_sales.csv: Dataset original utilizado.
-script.sql: Script completo com DDL, tratamentos de UPDATE e criação da View.
-dash.pbix: Arquivo do Power BI com o modelo de dados e visuais.
-
-
-🚀 Como Executar
-
-Execute o script.sql no seu PostgreSQL para configurar o ambiente.
-Importe os dados do CSV para a tabela criada.
-Abra o dash.pbix e aponte a fonte de dados para o seu banco local.
